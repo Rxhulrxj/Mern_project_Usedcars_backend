@@ -13,11 +13,11 @@ router.get("/", (req, res) => {
 
 router.post("/add-employee", AdminverifyToken, (req, res) => {
   if (req.body) {
-    let fullname = req.body.fullname;
-    let email = req.body.email;
-    let dob = req.body.dob;
-    let phone_number = req.body.phonenumber;
-    let address = req.body.address;
+    let fullname = req.body.Full_Name;
+    let email = req.body.Email_address;
+    let dob = req.body.Dob;
+    let phone_number = req.body.Phone_number;
+    let address = req.body.Address;
     let role = req.body.role;
     let branch = req.body.branch;
     let department = req.body.department;
@@ -161,7 +161,7 @@ router.post("/get-employees", AdminverifyToken, (req, res) => {
   }
 });
 
-router.post("/update-employee/:id", (req, res) => {
+router.post("/update-employee/:id",AdminverifyToken, (req, res) => {
   let id = req.params.id;
   let Full_Name,
     Email_address,

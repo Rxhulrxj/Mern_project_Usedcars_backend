@@ -10,32 +10,37 @@ router.post(
   "/add-vehicle",
   product_upload.fields([
     {
-      name: "frontview",
+      name: "front_view_image",
       maxCount: 1,
     },
     {
-      name: "rearleftview",
+      name: "rear_left_view_image",
       maxCount: 1,
     },
     {
-      name: "rearview",
+      name: "rear_view_image",
       maxCount: 1,
     },
     {
-      name: "leftsideview",
+      name: "left_side_image",
       maxCount: 1,
     },
     {
-      name: "rcbook",
+      name: "rc_book_image",
       maxCount: 1,
     },
     {
-      name: "pucc",
+      name: "pucc_image",
       maxCount: 1,
     },
+    {
+      name:"thumbnail",
+      maxCount: 1,
+    }
   ]),
   AdminverifyToken,
   (req, res) => {
+    console.log(req.body)
     let manufacture_name = req.body.manufacture_name;
     let model_name = req.body.model_name;
     let model_year = req.body.model_year;
@@ -57,6 +62,7 @@ router.post(
     let leftsideview;
     let rcbook;
     let pucc;
+    let thumbnail;
     let price = req.body.price;
     try {
       if (Engine_number == undefined || Engine_number == "") {
@@ -128,54 +134,63 @@ router.post(
           response: "Please Provide Vehicle Description",
         });
       } else if (
-        req.files.frontview == undefined ||
-        req.files.frontview == null
+        req.files.front_view_image == undefined ||
+        req.files.front_view_image == null
       ) {
         res.status(400).json({
           status: false,
           response: "Please Provide Front View Image",
         });
       } else if (
-        req.files.rearleftview == undefined ||
-        req.files.rearleftview == null
+        req.files.rear_left_view_image == undefined ||
+        req.files.rear_left_view_image == null
       ) {
         res.status(400).json({
           status: false,
           response: "Please Provide Rear Left Side View Image",
         });
       } else if (
-        req.files.rearview == undefined ||
-        req.files.rearview == null
+        req.files.rear_view_image == undefined ||
+        req.files.rear_view_image == null
       ) {
         res.status(400).json({
           status: false,
           response: "Please Provide Rear View Image",
         });
       } else if (
-        req.files.leftsideview == undefined ||
-        req.files.leftsideview == null
+        req.files.thumbnail == undefined ||
+        req.files.thumbnail == null
+      ) {
+        res.status(400).json({
+          status: false,
+          response: "Please Provide Thumbnail",
+        });
+      } else if (
+        req.files.left_side_image == undefined ||
+        req.files.left_side_image == null
       ) {
         res.status(400).json({
           status: false,
           response: "Please Provide Left Side View Image",
         });
-      } else if (req.files.rcbook == undefined || req.files.rcbook == null) {
+      } else if (req.files.rc_book_image == undefined || req.files.rc_book_image == null) {
         res.status(400).json({
           status: false,
           response: "Please Provide RcBook Image",
         });
-      } else if (req.files.pucc == undefined || req.files.pucc == null) {
+      } else if (req.files.pucc_image == undefined || req.files.pucc_image == null) {
         res.status(400).json({
           status: false,
           response: "Please Provide PUCC Image",
         });
       } else {
-        frontview = "uploads/vehicles/" + req.files.frontview[0].filename;
-        rearleftview = "uploads/vehicles/" + req.files.rearleftview[0].filename;
-        rearview = "uploads/vehicles/" + req.files.rearview[0].filename;
-        leftsideview = "uploads/vehicles/" + req.files.leftsideview[0].filename;
-        rcbook = "uploads/vehicles/" + req.files.rcbook[0].filename;
-        pucc = "uploads/vehicles/" + req.files.pucc[0].filename;
+        frontview = "uploads/vehicles/" + req.files.front_view_image[0].filename;
+        rearleftview = "uploads/vehicles/" + req.files.rear_left_view_image[0].filename;
+        rearview = "uploads/vehicles/" + req.files.rear_view_image[0].filename;
+        leftsideview = "uploads/vehicles/" + req.files.left_side_image[0].filename;
+        rcbook = "uploads/vehicles/" + req.files.rc_book_image[0].filename;
+        pucc = "uploads/vehicles/" + req.files.pucc_image[0].filename;
+        thumbnail = "uploads/vehicles/" + req.files.thumbnail[0].filename;
         db.query(
           "select * from vehicles where Engine_number=? or chasis_number=? or vehicle_registration_number=?",
           [Engine_number, chasis_number, vehicle_registration_number],
@@ -222,6 +237,7 @@ router.post(
                     rc_book_image: rcbook,
                     pucc_image: pucc,
                     created_by: req.user._id,
+                    thumbnail:thumbnail,
                     price: price,
                   },
                 ],
@@ -260,7 +276,7 @@ router.post(
 
 router.get("/getVehicle", (req, res) => {
   try {
-    db.query("select * from vehicles", (err, result) => {
+    db.query("select * from vehicles where published='yes'", (err, result) => {
       if (err) {
         console.log(err);
         res.status(500).json({
@@ -340,6 +356,10 @@ router.post(
       name: "pucc_image",
       maxCount: 1,
     },
+    {
+      name:"thumbnail",
+      maxCount: 1,
+    }
   ]),
   AdminverifyToken,
   (req, res) => {
@@ -349,6 +369,7 @@ router.post(
     let left_side_image;
     let rc_book_image;
     let pucc_image;
+    let thumbnail;
     var vehid = req.params.id;
     var result = [];
     result = req.body;
@@ -397,6 +418,10 @@ router.post(
       pucc_image = "uploads/vehicles/" + req.files.pucc_image[0].filename;
       result.pucc_image = pucc_image;
     }
+    if (req.files.thumbnail != undefined || req.files.thumbnail != null ) {
+      thumbnail = "uploads/vehicles/" + req.files.thumbnail[0].filename;
+      result.thumbnail = thumbnail;
+    }
     const now = new Date();
     const year = now.getFullYear();
     const month = (now.getMonth() + 1).toString().padStart(2, "0"); // add leading zero to month if needed
@@ -438,7 +463,7 @@ router.post("/search-vehicle", (req, res) => {
   let searchkeyword = req.body.searchkeyword;
   try {
     db.query(
-      `select * from vehicles where manufacture_name like '%${searchkeyword}%' or model_name like '%${searchkeyword}%'`,
+      `select * from vehicles where  published='yes' and ( manufacture_name like '%${searchkeyword}%' or model_name like '%${searchkeyword}%') `,
       (err, result) => {
         if (err) {
           console.log(err);
@@ -456,7 +481,7 @@ router.post("/search-vehicle", (req, res) => {
         } else {
           res.status(200).json({
             status: false,
-            response: "No Result Found",
+            response: [],
           });
         }
       }
@@ -478,7 +503,7 @@ router.post("/advance-search", (req, res) => {
   let price = req.body.price;
   try {
     db.query(
-      `select * from vehicles where manufacture_name=? and model_name=? and model_year=? and price${price} order by price`,
+      `select * from vehicles where  published='yes' and manufacture_name=? and model_name=? and model_year=? and price ${price} order by price`,
       [brand, model, year],
       (err, result) => {
         if (err) {
@@ -492,7 +517,7 @@ router.post("/advance-search", (req, res) => {
         if (result.length == 0) {
           res.status(200).json({
             status: false,
-            response: "No Result Found",
+            response: [],
           });
         } else {
           res.status(200).json({
@@ -515,7 +540,7 @@ router.post("/advance-search", (req, res) => {
 router.get("/get-model", (req, res) => {
   try {
     db.query(
-      "select manufacture_name,model_name from vehicles",
+      "select DISTINCT(manufacture_name),model_name from vehicles where published='yes'",
       (err, result) => {
         if (err) {
           console.log(err);
@@ -544,7 +569,7 @@ router.get("/get-model", (req, res) => {
 
 router.get("/get-brand", (req, res) => {
   try {
-    db.query("select manufacture_name from vehicles", (err, result) => {
+    db.query("select manufacture_name from vehicles where published='yes'", (err, result) => {
       if (err) {
         console.log(err);
         res.status(404).json({
@@ -571,7 +596,7 @@ router.get("/get-brand", (req, res) => {
 router.get("/getTopVehicle", (req, res) => {
   try {
     db.query(
-      "select * from vehicles order by modified_date DESC;",
+      "select * from vehicles where published='yes' order by modified_date DESC;",
       (err, result) => {
         if (err) {
           console.log(err);

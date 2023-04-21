@@ -104,4 +104,40 @@ router.post("/getAllusers", AdminverifyToken, (req, res) => {
     });
   }
 });
+
+router.post("/addProfile", UserverifyToken, (req, res) => {
+  let user_id = req.user._id;
+  let license_no = req.body.license_no;
+  let license_expiry = req.body.license_expiry;
+  let aadhar_no = req.body.aadhar_no;
+  try {
+    db.query(
+      "Insert into userprofile set?",
+      [
+        {
+          license_no: license_no,
+          license_expiry: license_expiry,
+          aadhar_no: aadhar_no,
+          user_id:user_id,
+        },
+        
+      ],
+      (err, result) => {
+        if (err) {
+          console.log(err)
+          res.status(500).json({
+            status: false,
+            response: "Something went wrong",
+          });
+        }
+        if(result.affectedRows > 0){
+          res.status(200).json({
+            status: true,
+            response: "Profile Added Successfully",
+          });
+        }
+      }
+    );
+  } catch (error) {}
+});
 module.exports = router;

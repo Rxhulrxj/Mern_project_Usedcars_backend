@@ -3,19 +3,13 @@ const router = express.Router();
 const db = require("../../db_connect");
 const bcrypt = require("bcrypt");
 const jsonwebtoken = require("jsonwebtoken");
-const nodemailer = require("nodemailer");
+const { transporter } = require("../../middlewares/middleware");
+
 require("dotenv").config();
 router.get("/", (req, res) => {
   res.json("auth api is working");
 });
-let transporter = nodemailer.createTransport({
-  service: "gmail",
-  host: "smtp.gmail.com",
-  auth: {
-    user: process.env.email_address,
-    pass: process.env.email_password,
-  },
-});
+
 router.post("/login", (req, res) => {
   if (!req.body) {
     res

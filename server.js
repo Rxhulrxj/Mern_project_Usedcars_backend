@@ -6,6 +6,8 @@ const adminroute = require("./routes/vehicles/vehicle");
 const emproute = require("./routes/employee/employee");
 const userroute = require("./routes/users/users");
 const enquiryroute = require("./routes/enquiry/enquiry");
+const dashboardroute = require("./routes/dashboard/dashboard");
+const sellerroute = require("./routes/seller/seller")
 const app = express();
 const path = require("path");
 const cors = require("cors");
@@ -29,6 +31,8 @@ app.use("/vehicle", adminroute);
 app.use("/employee", emproute);
 app.use("/users", userroute);
 app.use("/enquiry", enquiryroute);
+app.use("/dashboard", dashboardroute);
+app.use('/sellers',sellerroute)
 app.use((err, req, res, next) => {
   console.log(err.message);
   res.status(400).json({

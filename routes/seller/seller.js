@@ -55,7 +55,7 @@ router.post(
     let Aadhar = req.body.Aadhar;
     let manufacture_name = req.body.Manufacturename;
     let model_name = req.body.ModelName;
-    let model_year = req.body.Manufacturename;
+    let model_year = req.body.modelyear;
     let Vehicle_color = req.body.vehicleColor;
     let Engine_number = req.body.engineNumber;
     let chasis_number = req.body.ChasisNumber;

@@ -300,6 +300,32 @@ router.get("/getVehicle", (req, res) => {
     });
   }
 });
+router.post("/getAllVehicle",AdminverifyToken, (req, res) => {
+  try {
+    db.query("select * from vehicles", (err, result) => {
+      if (err) {
+        console.log(err);
+        res.status(500).json({
+          status: false,
+          response: "Something Went Wrong",
+          reason: err,
+        });
+      } else {
+        res.status(200).json({
+          status: true,
+          response: result,
+        });
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      status: false,
+      response: "Something Went Wrong",
+      reason: error,
+    });
+  }
+});
 router.get("/getVehicle/:id", (req, res) => {
   try {
     let id = req.params.id;
